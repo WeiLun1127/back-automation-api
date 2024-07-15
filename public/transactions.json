@@ -1,0 +1,110 @@
+[
+    {
+        "id": "RE1020329",
+        "currency": "MYR",
+        "value": "130.99",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "SUCCESSFUL"
+    },
+    {
+        "id": "RE1020330",
+        "currency": "JPY",
+        "value": "80.25",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY OUT",
+        "status": "PENDING"
+    },
+    {
+        "id": "RE1020331",
+        "currency": "SGD",
+        "value": "40.60",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY OUT",
+        "status": "APPROVED"
+    },
+    {
+        "id": "RE1020332",
+        "currency": "KRN",
+        "value": "91.30",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "IN PROGRESS"
+    },
+    {
+        "id": "RE1020333",
+        "currency": "MYR",
+        "value": "140.925",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY OUT",
+        "status": "FAILED"
+    },
+    {
+        "id": "RE1020334",
+        "currency": "IDR",
+        "value": "244.59",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "SUCCESSFUL"
+    },
+    {
+        "id": "RE1020335",
+        "currency": "IDR",
+        "value": "36.51",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY OUT",
+        "status": "SUCCESSFUL"
+    },
+    {
+        "id": "RE1020336",
+        "currency": "THB",
+        "value": "100.23",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "PENDING"
+    },
+    {
+        "id": "RE1020337",
+        "currency": "JPN",
+        "value": "50.23",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY OUT",
+        "status": "IN PROGRESS"
+    },
+    {
+        "id": "RE1020338",
+        "currency": "MMK",
+        "value": "20.41",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "IN PROGRESS"
+    },
+    {
+        "id": "RE1020339",
+        "currency": "MYR",
+        "value": "200.00",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "SUCCESSFULL"
+    },
+    {
+        "id": "RE1020340",
+        "currency": "MYR",
+        "value": "200.00",
+        "created_date": "2024-05-24 12:12:21",
+        "updated_date": "2024-05-24 12:12:21",
+        "type": "PAY IN",
+        "status": "SUCCESSFULL"
+    }
+]
