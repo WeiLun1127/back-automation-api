@@ -1,45 +1,16 @@
-/**
-=========================================================
-* Material Dashboard 2 PRO React TS - v1.0.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-2-pro-react-ts
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { JSXElementConstructor, Key, ReactElement, useEffect, useState } from "react";
 
-// react-router components
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
-// @mui material components
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 
-// Material Dashboard 2 PRO React TS components
-
-// Material Dashboard 2 PRO React TS exampless
-
-// Material Dashboard 2 PRO React TS themes
 import theme from "modules/settings/theme-settings/theme";
 
-// Material Dashboard 2 PRO React TS Dark Mode themes
 import themeDark from "modules/settings/theme-settings/theme-dark";
 
-// RTL plugins
-
-// Material Dashboard 2 PRO React TS routes
-
-// Material Dashboard 2 PRO React TS contexts
 import { setMiniSidenav, useMaterialUIController } from "context";
 
-// Images
 import Home from "modules/layouts";
 import Bank from "modules/layouts/Bank";
 import Transactions from "modules/layouts/report";
