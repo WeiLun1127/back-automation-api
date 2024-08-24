@@ -8,13 +8,14 @@ import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Bank = () => {
   const { bankCode } = useParams();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [ws, setWs] = useState(null);
 
   const bank = useMemo(() => {
     if (bankCode === "mbb") {
@@ -85,6 +86,20 @@ const Bank = () => {
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
+
+  const handleClick = () => {
+    navigate("/progress");
+  };
+
+  // WebSocket cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (ws) {
+        console.log("Closing WebSocket connection.");
+        ws.close();
+      }
+    };
+  }, [ws]);
 
   return (
     <DashboardLayout backgroundImage={bank.backgroundImage}>
@@ -166,6 +181,7 @@ const Bank = () => {
                     color="dark"
                     size="medium"
                     style={{ color: bank.color, background: bank.background }}
+                    onClick={handleClick}
                   >
                     Login
                   </MDButton>

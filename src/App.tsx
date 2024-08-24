@@ -14,6 +14,7 @@ import { setMiniSidenav, useMaterialUIController } from "context";
 import Home from "modules/layouts";
 import Bank from "modules/layouts/Bank";
 import Transactions from "modules/layouts/report";
+import Progress from "modules/layouts/Progress";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -86,6 +87,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/bank/:bankCode" element={<Bank />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/progress" element={<Progress />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </ThemeProvider>
