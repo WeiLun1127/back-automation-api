@@ -5,6 +5,7 @@ import DataTable from "assets/examples/Tables/DataTable";
 import MDBox from "components/MDBox";
 import MDSnackbar from "components/MDSnackbar";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const tableColumns = [
   { Header: "", accessor: "edit", width: "1%" },
@@ -37,12 +38,17 @@ const Transactions = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = (await fetch("/transactions.json").then((res) => res.json())) as Transaction[];
-
-        const newData = data.map((row, index) => ({
+        const data = await axios.get<Transaction[]>(
+          "http://18.138.168.43:10300/api/json/transactions.json",
+          {
+            timeout: 10000,
+          }
+        );
+        console.log("Data fetched successfully:", data.data);
+        const newData = data.data.map((row, index) => ({
           ...row,
+          transaction_id: row.id.toString(),
           id: index + 1,
-          transaction_id: row.id,
         }));
 
         setTableData(newData);
