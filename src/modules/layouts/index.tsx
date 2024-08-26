@@ -79,8 +79,11 @@ const Home = () => {
   const [selectedCurrency, setSelectedCurrency] = useState("currency");
   const [currentDateTime, setCurrentDateTime] = useState("");
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
+  const handleBankChange = (event: SelectChangeEvent<string>) => {
     setSelectedBank(event.target.value);
+  };
+
+  const handleCurrencyChange = (event: SelectChangeEvent<string>) => {
     setSelectedCurrency(event.target.value);
   };
 
@@ -102,7 +105,7 @@ const Home = () => {
           <Card style={{ minWidth: 350, maxWidth: 500 }}>
             <MDBox p={3}>
               <MDTypography variant="h6" textAlign="left">
-                Now: {currentDateTime}
+                Now:{currentDateTime}
               </MDTypography>
             </MDBox>
             <MDBox p={3}>
@@ -128,7 +131,7 @@ const Home = () => {
                 <Grid item display="flex" justifyContent="center" xs={12}>
                   <Select
                     value={selectedCurrency}
-                    onChange={handleChange}
+                    onChange={handleCurrencyChange}
                     placeholder="Currency"
                     style={{ width: 300, height: 44 }}
                   >
@@ -146,7 +149,7 @@ const Home = () => {
                 <Grid item display="flex" justifyContent="center" xs={12}>
                   <Select
                     value={selectedBank}
-                    onChange={handleChange}
+                    onChange={handleBankChange}
                     placeholder="Bank"
                     style={{ width: 300, height: 44 }}
                   >
