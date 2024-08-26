@@ -3,41 +3,106 @@ import { CircularProgress, Typography, Box } from "@mui/material";
 
 const Progress: React.FC = () => {
   const [progress, setProgress] = useState<number>(0);
+  const [message, setMessage] = useState<string>("In Progress...");
 
   useEffect(() => {
-    const ws = new WebSocket("ws://18.138.168.43:9501/ws");
+    let ws: WebSocket;
+    let retryStage = 0;
+    let intervalId: NodeJS.Timeout | null = null;
 
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-      // Send any initial data if needed
-      ws.send(JSON.stringify({ message: "Start process" }));
+    const connectWebSocket = (rcid: string) => {
+      ws = new WebSocket("ws://18.138.168.43:9501/ws");
+
+      ws.onopen = () => {
+        console.log("WebSocket connection established");
+        if (rcid) {
+          ws.send(`attach^^${rcid}`);
+        } else {
+          ws.send("Start process");
+        }
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        // console.log("Received message:", data);
+
+        switch (data.ExeF) {
+          case "initial":
+            if (!rcid) {
+              console.log(`event.data: ${event.data} jdata.ExeF: initial`);
+              ws.send(`${data.Data}^^"EncryptedMessage`); //
+            }
+            break;
+          case "codedigest":
+            const [code, displayMessage] = data.Data.split("^^");
+            console.log(`InProgress:${progress} event.data: ${event.data} jdata.ExeF: codedigest`);
+            if (parseInt(code) >= 900) {
+              setMessage("System error! Please try again shortly.");
+              retryStage = 0;
+            } else if (parseInt(code) >= 100 && parseInt(code) < 200) {
+              setMessage("Thank you!");
+              setProgress(100);
+            } else {
+              setMessage(displayMessage || "Processing...");
+            }
+            break;
+          case "statechanged":
+            setMessage(`Server: ${data.Data}`);
+            break;
+          case "wait":
+            const waitTime = parseInt(data.Data);
+            retryStage = 1;
+            startCountdown(waitTime);
+            break;
+          default:
+            setMessage("Unknown message received");
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        setMessage("WebSocket error occurred.");
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+        if (retryStage === 1) {
+          retryStage = 2;
+          reconnectWebSocket(rcid);
+        }
+      };
     };
 
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log("Received message:", message);
+    const startCountdown = (waitTime: number) => {
+      let countdown = waitTime;
 
-      // Update progress based on the message received from the server
-      if (message.progress) {
-        setProgress(message.progress);
+      const countdownInterval = setInterval(() => {
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          setMessage("System error! Please try again shortly.");
+          if (ws.readyState !== WebSocket.CLOSED) {
+            ws.close();
+          }
+        } else {
+          countdown -= 1000;
+          setMessage(`Waiting... ${Math.floor(countdown / 1000)} seconds remaining`);
+        }
+      }, 1000);
+
+      intervalId = countdownInterval;
+    };
+
+    const reconnectWebSocket = (rcid: string) => {
+      if (retryStage === 2) {
+        connectWebSocket(rcid);
       }
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress >= 100 ? 100 : prevProgress + 5));
-    }, 800);
+    connectWebSocket("");
 
     return () => {
-      clearInterval(timer);
-      ws.close();
+      if (intervalId) clearInterval(intervalId);
+      if (ws) ws.close();
     };
   }, []);
 
@@ -58,7 +123,7 @@ const Progress: React.FC = () => {
       />
       <Box mt={2}>
         <Typography variant="h6" color="textSecondary">
-          Loading... {progress}%
+          {message} {progress}%
         </Typography>
       </Box>
     </Box>
