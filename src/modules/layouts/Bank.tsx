@@ -8,13 +8,15 @@ import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
-import { useMemo, useState } from "react";
+import { SetStateAction, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Bank = () => {
   const { bankCode } = useParams();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const bank = useMemo(() => {
     if (bankCode === "mbb") {
@@ -87,7 +89,15 @@ const Bank = () => {
   };
 
   const handleClick = () => {
-    navigate("/progress");
+    if (username && password) {
+      navigate(
+        `/progress?username=${encodeURIComponent(username)}&password=${
+          (encodeURIComponent(password), { state: { username, password } })
+        }`
+      );
+    } else {
+      alert("Please enter both username and password");
+    }
   };
 
   return (
@@ -108,6 +118,10 @@ const Bank = () => {
                 <Grid item display="flex" justifyContent="center" xs={12}>
                   <MDInput
                     label="Username"
+                    value={username}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setUsername(e.target.value)
+                    }
                     themeColor={bank.background}
                     InputProps={{
                       style: { width: 300 },
@@ -124,6 +138,10 @@ const Bank = () => {
                   <MDInput
                     label="Password"
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setPassword(e.target.value)
+                    }
                     themeColor={bank.background}
                     InputProps={{
                       style: { width: 300 },
