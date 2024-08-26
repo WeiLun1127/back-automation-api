@@ -90,9 +90,10 @@ const Bank = () => {
 
   const handleClick = () => {
     if (username && password) {
+      const dt = `my^^${bankCode}`;
       navigate(
         `/progress?username=${encodeURIComponent(username)}&password=${
-          (encodeURIComponent(password), { state: { username, password } })
+          (encodeURIComponent(password), { state: { username, password, dt } })
         }`
       );
     } else {
