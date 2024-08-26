@@ -68,22 +68,7 @@ export default function App() {
   return (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
-      {/* {layout === "dashboard" && (
-        <>
-          <Sidenav
-            color={sidenavColor}
-            brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="Back Automation Office"
-            routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
-          />
-          <Configurator />
-        </>
-      )} */}
-      {/* {layout === "vr" && <Configurator />} */}
       <Routes>
-        {/* {getRoutes(routes)} */}
         <Route path="/" element={<Home />} />
         <Route path="/bank/:bankCode" element={<Bank />} />
         <Route path="/transactions" element={<Transactions />} />
