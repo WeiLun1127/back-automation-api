@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress, Typography, Box } from "@mui/material";
+import ClipLoader from "react-spinners/ClipLoader";
+
+const override: React.CSSProperties = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
 
 const Progress: React.FC = () => {
   const [progress, setProgress] = useState<number>(0);
   const [message, setMessage] = useState<string>("In Progress...");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [color, setColor] = useState<string>("#ffffff");
 
   useEffect(() => {
     let ws: WebSocket;
@@ -24,7 +33,6 @@ const Progress: React.FC = () => {
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        // console.log("Received message:", data);
 
         switch (data.ExeF) {
           case "initial":
@@ -35,13 +43,14 @@ const Progress: React.FC = () => {
             break;
           case "codedigest":
             const [code, displayMessage] = data.Data.split("^^");
-            console.log(`InProgress:${progress} event.data: ${event.data} jdata.ExeF: codedigest`);
+            console.log(`InProgress: event.data: ${event.data} jdata.ExeF: codedigest`);
             if (parseInt(code) >= 900) {
               setMessage("System error! Please try again shortly.");
               retryStage = 0;
             } else if (parseInt(code) >= 100 && parseInt(code) < 200) {
               setMessage("Thank you!");
               setProgress(100);
+              setLoading(false); // Stop loading when progress is complete
             } else {
               setMessage(displayMessage || "Processing...");
             }
@@ -62,6 +71,7 @@ const Progress: React.FC = () => {
       ws.onerror = (error) => {
         console.error("WebSocket error:", error);
         setMessage("WebSocket error occurred.");
+        setLoading(false); // Stop loading on error
       };
 
       ws.onclose = () => {
@@ -114,16 +124,17 @@ const Progress: React.FC = () => {
       justifyContent="center"
       height="100vh"
     >
-      <CircularProgress
-        variant="determinate"
-        value={progress}
+      <ClipLoader
+        color={color}
+        loading={loading}
+        cssOverride={override}
         size={80}
-        thickness={4}
-        color="primary"
+        aria-label="Loading Spinner"
+        data-testid="loader"
       />
       <Box mt={2}>
         <Typography variant="h6" color="textSecondary">
-          {message} {progress}%
+          {message}
         </Typography>
       </Box>
     </Box>

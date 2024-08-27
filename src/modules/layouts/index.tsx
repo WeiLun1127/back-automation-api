@@ -100,6 +100,7 @@ const Home = () => {
 
   const handleLaunchBank = async () => {
     if (selectedBank === "bank") {
+      alert("Please select a bank.");
       console.error("Please select a bank.");
       return;
     }
@@ -128,6 +129,8 @@ const Home = () => {
 
       setJsonData(formattedData);
 
+      localStorage.setItem("jsonData", formattedData);
+
       const response = await fetch("https://18.138.168.43:10301/api/token", {
         method: "POST",
         headers: {
@@ -144,7 +147,8 @@ const Home = () => {
       }
 
       const result = await response.json();
-      console.log(result);
+      // console.log(result);data
+      console.log("Success:", result);
       navigate(`/bank/${selectedBank}${result.Url}?${result.Token}`);
     } catch (error) {
       console.error("Error:", error);
@@ -156,6 +160,11 @@ const Home = () => {
     const formattedDateTime = nowdate.toISOString();
     setCurrentDateTime(formattedDateTime);
     setTxnIdx("IDX" + getRandomInteger(700000, 999999));
+
+    const savedJsonData = localStorage.getItem("jsonData");
+    if (savedJsonData) {
+      setJsonData(savedJsonData);
+    }
   }, []);
 
   const getRandomInteger = (min: number, max: number) => {
@@ -271,15 +280,26 @@ const Home = () => {
                   <MDInput
                     label="Amount"
                     value={amount}
-                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
-                      setAmount(e.target.value)
-                    }
+                    onChange={(e: { target: { value: string } }) => {
+                      const value = e.target.value;
+                      // Regular expression to allow only numbers with optional decimal places
+                      if (/^\d*\.?\d{0,2}$/.test(value)) {
+                        setAmount(value);
+                      }
+                    }}
                     InputProps={{ style: { width: 300 } }}
                   />
                 </Grid>
 
                 <Grid item display="flex" justifyContent="center" xs={12}>
-                  <MDInput label="Data" value={jsonData} InputProps={{ style: { width: 300 } }} />
+                  <MDInput
+                    label="Data"
+                    value={jsonData}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setJsonData(e.target.value)
+                    }
+                    InputProps={{ style: { width: 300 } }}
+                  />
                 </Grid>
               </Grid>
             </MDBox>
