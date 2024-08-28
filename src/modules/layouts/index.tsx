@@ -8,69 +8,24 @@ import { useState, useEffect, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Currency = [
-  {
-    label: "MYR",
-    value: "myr",
-  },
-  {
-    label: "THB",
-    value: "thb",
-  },
-  {
-    label: "VND",
-    value: "vnd",
-  },
-  {
-    label: "IDR",
-    value: "idr",
-  },
-  {
-    label: "INR",
-    value: "inr",
-  },
-  {
-    label: "KRW",
-    value: "krw",
-  },
-  {
-    label: "JPN",
-    value: "jpn",
-  },
-  {
-    label: "SGD",
-    value: "sgd",
-  },
-  {
-    label: "MMK",
-    value: "mmk",
-  },
+  { label: "MYR", value: "myr" },
+  { label: "THB", value: "thb" },
+  { label: "VND", value: "vnd" },
+  { label: "IDR", value: "idr" },
+  { label: "INR", value: "inr" },
+  { label: "KRW", value: "krw" },
+  { label: "JPN", value: "jpn" },
+  { label: "SGD", value: "sgd" },
+  { label: "MMK", value: "mmk" },
 ];
 
 const Banks = [
-  {
-    label: "Maybank",
-    value: "mbb",
-  },
-  {
-    label: "Hong Leong Bank",
-    value: "hlb",
-  },
-  {
-    label: "CIMB",
-    value: "cimb",
-  },
-  {
-    label: "Public Bank",
-    value: "pbb",
-  },
-  {
-    label: "RHB",
-    value: "rhb",
-  },
-  {
-    label: "BSN",
-    value: "bsn",
-  },
+  { label: "Maybank", value: "mbb" },
+  { label: "Hong Leong Bank", value: "hlb" },
+  { label: "CIMB", value: "cimb" },
+  { label: "Public Bank", value: "pbb" },
+  { label: "RHB", value: "rhb" },
+  { label: "BSN", value: "bsn" },
 ];
 
 const Home = () => {
@@ -92,11 +47,6 @@ const Home = () => {
   const handleCurrencyChange = (event: SelectChangeEvent<string>) => {
     setSelectedCurrency(event.target.value);
   };
-
-  // const handleLaunchBank = () => {
-  //   if (selectedBank === "bank") return;
-  //   navigate(`/bank/${selectedBank}`);
-  // };
 
   const handleLaunchBank = async () => {
     if (selectedBank === "bank") {

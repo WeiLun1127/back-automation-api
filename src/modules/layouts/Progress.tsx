@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress, Typography, Box } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const override: React.CSSProperties = {
@@ -13,6 +13,7 @@ const Progress: React.FC = () => {
   const [message, setMessage] = useState<string>("In Progress...");
   const [loading, setLoading] = useState<boolean>(true);
   const [color, setColor] = useState<string>("#ffffff");
+  const [rcid, setRcid] = useState<string>("");
 
   useEffect(() => {
     let ws: WebSocket;
@@ -38,6 +39,7 @@ const Progress: React.FC = () => {
           case "initial":
             if (!rcid) {
               console.log(`event.data: ${event.data} jdata.ExeF: initial`);
+              setRcid(data.Data);
               ws.send(`${data.Data}^^"EncryptedMessage`); //
             }
             break;
@@ -132,9 +134,13 @@ const Progress: React.FC = () => {
         aria-label="Loading Spinner"
         data-testid="loader"
       />
-      <Box mt={2}>
-        <Typography variant="h6" color="textSecondary">
+      <Box mt={2} textAlign="center">
+        <Typography variant="h4" color="textPrimary">
           {message}
+        </Typography>
+        <Box mt={1}></Box>
+        <Typography variant="subtitle1" color="textSecondary" sx={{ fontSize: "0.85rem" }}>
+          RCID : {rcid}
         </Typography>
       </Box>
     </Box>
