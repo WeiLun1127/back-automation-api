@@ -8,15 +8,15 @@ import { useState, useEffect, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Currency = [
-  { label: "MYR", value: "myr" },
-  { label: "THB", value: "thb" },
-  { label: "VND", value: "vnd" },
-  { label: "IDR", value: "idr" },
-  { label: "INR", value: "inr" },
-  { label: "KRW", value: "krw" },
-  { label: "JPN", value: "jpn" },
-  { label: "SGD", value: "sgd" },
-  { label: "MMK", value: "mmk" },
+  { label: "MYR", value: "MY" },
+  { label: "THB", value: "TH" },
+  { label: "VND", value: "VN" },
+  { label: "IDR", value: "ID" },
+  { label: "INR", value: "IN" },
+  { label: "KRW", value: "KR" },
+  { label: "JPN", value: "JP" },
+  { label: "SGD", value: "SG" },
+  { label: "MMK", value: "MM" },
 ];
 
 const Banks = [
@@ -30,12 +30,16 @@ const Banks = [
 
 const Home = () => {
   const navigate = useNavigate();
-  const [selectedBank, setSelectedBank] = useState("bank");
-  const [selectedCurrency, setSelectedCurrency] = useState("currency");
+  const [retryUrl, setretryUrl] = useState("https://retry.yahoo.com");
+  const [exitUrl, setexitUrl] = useState("https://exit.yahoo.com/");
+  const [callbackUrl, setcallbackUrl] = useState("https://callback.yahoo.com/");
+  const [apiUrl, setapiUrl] = useState("http://18.138.168.43:10300/api/token/");
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [merchantCode, setMerchantCode] = useState("MMY090");
   const [key, setKey] = useState("Kjd+-0H8d0~n@bj8");
   const [txnIdx, setTxnIdx] = useState("");
+  const [selectedBank, setSelectedBank] = useState("bank");
+  const [selectedCurrency, setSelectedCurrency] = useState("currency");
   const [amount, setAmount] = useState("10");
   const [encData, setEncData] = useState("");
   const [jsonData, setJsonData] = useState("");
@@ -61,35 +65,38 @@ const Home = () => {
     }
 
     const data = {
+      UrlExit: exitUrl,
+      UrlRetry: retryUrl,
+      UrlCallback: callbackUrl,
       TxnIdx: txnIdx,
       Currency: selectedCurrency,
       Bank: selectedBank,
       Amount: amount,
     };
+    localStorage.setItem("exitURL:", data.UrlExit);
+    localStorage.setItem("retryURL:", data.UrlRetry);
+    localStorage.setItem("callbackURL:", data.UrlCallback);
 
     try {
       const encryptedData = await Encrypt(key, JSON.stringify(data));
       setEncData(encryptedData);
 
-      // Construct the JSON string with MerchantCode and Code
-      const formattedData = JSON.stringify({
+      localStorage.setItem("encryptedData", encryptedData);
+
+      const proceedData = JSON.stringify({
         MerchantCode: merchantCode,
         Code: encryptedData,
       });
 
-      setJsonData(formattedData);
+      setJsonData(proceedData);
+      localStorage.setItem("jsonData", proceedData);
 
-      localStorage.setItem("jsonData", formattedData);
-
-      const response = await fetch("https://18.138.168.43:10301/api/token", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          MerchantCode: merchantCode,
-          Code: encryptedData,
-        }),
+        body: proceedData,
       });
 
       if (!response.ok) {
@@ -97,9 +104,13 @@ const Home = () => {
       }
 
       const result = await response.json();
-      // console.log(result);data
+      const encodeURL = encodeURIComponent(result.Token);
+
+      localStorage.setItem("token", result.Token);
       console.log("Success:", result);
-      navigate(`/bank/${selectedBank}${result.Url}?${result.Token}`);
+      console.log("data.Url:", result.Url);
+      navigate(`/bank/${selectedBank}`);
+      // navigate(`/bank/${selectedBank}${result.Url}?token=${encodeURL}`);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -111,10 +122,10 @@ const Home = () => {
     setCurrentDateTime(formattedDateTime);
     setTxnIdx("IDX" + getRandomInteger(700000, 999999));
 
-    const savedJsonData = localStorage.getItem("jsonData");
-    if (savedJsonData) {
-      setJsonData(savedJsonData);
-    }
+    // const savedJsonData = localStorage.getItem("jsonData");
+    // if (savedJsonData) {
+    //   setJsonData(savedJsonData);
+    // }
   }, []);
 
   const getRandomInteger = (min: number, max: number) => {
@@ -146,19 +157,63 @@ const Home = () => {
       <Grid container justifyContent="center">
         <Grid item display="flex" justifyContent="center" lg={12} xl={8}>
           <Card style={{ minWidth: 350, maxWidth: 500 }}>
-            <MDBox p={3}>
+            <MDBox p={2}>
               <MDTypography variant="h6" textAlign="left">
                 Now:{currentDateTime}
               </MDTypography>
             </MDBox>
-            <MDBox p={3}>
+            <MDBox p={2}>
               <MDTypography variant="h4" textAlign="center">
                 Home
               </MDTypography>
             </MDBox>
 
             <MDBox component="form" pb={3} px={3}>
-              <Grid container spacing={3}>
+              <Grid container spacing={2}>
+                <Grid item display="flex" justifyContent="center" xs={12}>
+                  <MDInput
+                    label="Retry URL"
+                    value={retryUrl}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setretryUrl(e.target.value)
+                    }
+                    InputProps={{ style: { width: 300 } }}
+                  />
+                </Grid>
+
+                <Grid item display="flex" justifyContent="center" xs={12}>
+                  <MDInput
+                    label="Exit URL"
+                    value={exitUrl}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setexitUrl(e.target.value)
+                    }
+                    InputProps={{ style: { width: 300 } }}
+                  />
+                </Grid>
+
+                <Grid item display="flex" justifyContent="center" xs={12}>
+                  <MDInput
+                    label="CallBack URL"
+                    value={callbackUrl}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setcallbackUrl(e.target.value)
+                    }
+                    InputProps={{ style: { width: 300 } }}
+                  />
+                </Grid>
+
+                <Grid item display="flex" justifyContent="center" xs={12}>
+                  <MDInput
+                    label="API URL"
+                    value={apiUrl}
+                    onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                      setapiUrl(e.target.value)
+                    }
+                    InputProps={{ style: { width: 300 } }}
+                  />
+                </Grid>
+
                 <Grid item display="flex" justifyContent="center" xs={12}>
                   <MDInput
                     label="Merchant Code"

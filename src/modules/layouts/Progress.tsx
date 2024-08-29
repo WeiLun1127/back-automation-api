@@ -12,24 +12,37 @@ const Progress: React.FC = () => {
   const [progress, setProgress] = useState<number>(0);
   const [message, setMessage] = useState<string>("In Progress...");
   const [loading, setLoading] = useState<boolean>(true);
+  const [display, setDisplay] = useState("");
   const [color, setColor] = useState<string>("#ffffff");
   const [rcid, setRcid] = useState<string>("");
+  let ws: WebSocket | null = null;
+  let retryStage = 0;
+  let intervalId: NodeJS.Timeout | null = null;
+
+  const onErrorFound = (errorMsg: string, url: string) => {
+    setMessage(errorMsg);
+    setLoading(false);
+  };
+
+  const onSucceed = (successMessage: string) => {
+    setMessage(successMessage);
+    setProgress(100);
+    setLoading(false);
+    console.log("Operation succeeded:", successMessage);
+  };
 
   useEffect(() => {
-    let ws: WebSocket;
-    let retryStage = 0;
-    let intervalId: NodeJS.Timeout | null = null;
+    const storedEncryptedData = localStorage.getItem("encryptedData");
+    const token = localStorage.getItem("token") || "";
+    const username = localStorage.getItem("username") || "";
+    const password = localStorage.getItem("password") || "";
 
     const connectWebSocket = (rcid: string) => {
       ws = new WebSocket("ws://18.138.168.43:9501/ws");
+      console.log("WebSocket is now connecting");
 
       ws.onopen = () => {
-        console.log("WebSocket connection established");
-        if (rcid) {
-          ws.send(`attach^^${rcid}`);
-        } else {
-          ws.send("Start process");
-        }
+        console.log(`WebSocket is open now. [rcid: ${rcid}]`);
       };
 
       ws.onmessage = (event) => {
@@ -38,31 +51,64 @@ const Progress: React.FC = () => {
         switch (data.ExeF) {
           case "initial":
             if (!rcid) {
-              console.log(`event.data: ${event.data} jdata.ExeF: initial`);
+              const cid = data.Data;
+              console.log(`event.data: ${event.data} eventjdata.ExeF: initial`);
               setRcid(data.Data);
-              ws.send(`${data.Data}^^"EncryptedMessage`); //
+              console.log(`params.get('token'):${token}`);
+              console.log("decodeURIComponent:", decodeURIComponent(token));
+              ws.send(`${cid}^^start^=${token}^=${username}^=${password}`);
+            } else {
+              console.log("reconnecting:", "attach^^" + rcid);
+              ws.send("attach^^" + rcid);
+              retryStage = 3;
             }
             break;
           case "codedigest":
-            const [code, displayMessage] = data.Data.split("^^");
-            console.log(`InProgress: event.data: ${event.data} jdata.ExeF: codedigest`);
-            if (parseInt(code) >= 900) {
-              setMessage("System error! Please try again shortly.");
-              retryStage = 0;
-            } else if (parseInt(code) >= 100 && parseInt(code) < 200) {
-              setMessage("Thank you!");
-              setProgress(100);
-              setLoading(false); // Stop loading when progress is complete
+            let codedata = data.Data.split("^=");
+            console.log(`event.data: ${event.data} eventjdata.ExeF: codedigest`);
+            if (codedata.length === 2) {
+              setDisplay("raw: " + codedata[1]);
+              const messageData = JSON.parse(decodeURIComponent(codedata[1]));
+              let reactUrl = "javascript:window.close('','_parent','');";
+              let showMessage = "System error! Please try again shortly";
+              const code = parseInt(codedata[0], 0);
+
+              if (messageData.UrlExit) {
+                reactUrl = messageData.UrlExit;
+              } else if (messageData.UrlRetry) {
+                reactUrl = messageData.UrlRetry;
+              }
+              if (messageData.Message) {
+                showMessage = messageData.Message;
+              }
+
+              console.log(
+                "code: ",
+                code,
+                ", messageData.Message:",
+                messageData.Message,
+                ", messageData.UrlExit: ",
+                messageData.UrlExit,
+                ", messageData.UrlRetry:",
+                messageData.UrlRetry
+              );
+              if (code >= 900) {
+                onErrorFound(showMessage, reactUrl);
+              } else if (code >= 100 && code < 200) {
+                onSucceed("Thank you");
+              }
             } else {
-              setMessage(displayMessage || "Processing...");
+              setDisplay("code: " + data.Data);
             }
             break;
-          case "statechanged":
+
+          case "message":
             setMessage(`Server: ${data.Data}`);
             break;
           case "wait":
             const waitTime = parseInt(data.Data);
             retryStage = 1;
+            console.log(`[retrystage: ${retryStage}]`);
             startCountdown(waitTime);
             break;
           default:
@@ -80,6 +126,7 @@ const Progress: React.FC = () => {
         console.log("WebSocket connection closed");
         if (retryStage === 1) {
           retryStage = 2;
+          console.log(`[retrystage: ${retryStage}]`);
           reconnectWebSocket(rcid);
         }
       };

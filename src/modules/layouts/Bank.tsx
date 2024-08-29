@@ -88,13 +88,16 @@ const Bank = () => {
   const handleClick = () => {
     if (username && password) {
       const dt = `my^^${bankCode}`;
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
+      localStorage.setItem("dt", dt);
       navigate(
         `/progress?username=${encodeURIComponent(username)}&password=${encodeURIComponent(
           password
-        )}`,
-        {
-          state: { username, password, dt },
-        }
+        )}`
+        // {
+        //   state: { username, password, dt },
+        // }
       );
     } else {
       alert("Please enter both username and password");
