@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button, Card, Grid } from "@mui/material";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const override: React.CSSProperties = {
@@ -15,6 +15,9 @@ const Progress: React.FC = () => {
   const [display, setDisplay] = useState("");
   const [color, setColor] = useState<string>("#ffffff");
   const [rcid, setRcid] = useState<string>("");
+  const [rawData, setRawData] = useState<string>("");
+  const [continueUrl, setContinueUrl] = useState<string>("");
+  const [messageData, setMessageData] = useState<{ Message?: string }>({});
   let ws: WebSocket | null = null;
   let retryStage = 0;
   let intervalId: NodeJS.Timeout | null = null;
@@ -22,13 +25,14 @@ const Progress: React.FC = () => {
   const onErrorFound = (errorMsg: string, url: string) => {
     setMessage(errorMsg);
     setLoading(false);
+    setContinueUrl(url);
   };
 
-  const onSucceed = (successMessage: string) => {
+  const onSucceed = (successMessage: string, url: string) => {
     setMessage(successMessage);
     setProgress(100);
     setLoading(false);
-    console.log("Operation succeeded:", successMessage);
+    setContinueUrl(url);
   };
 
   useEffect(() => {
@@ -67,8 +71,17 @@ const Progress: React.FC = () => {
             let codedata = data.Data.split("^=");
             console.log(`event.data: ${event.data} eventjdata.ExeF: codedigest`);
             if (codedata.length === 2) {
-              setDisplay("raw: " + codedata[1]);
-              const messageData = JSON.parse(decodeURIComponent(codedata[1]));
+              // setDisplay("RAW: " + codedata[1].toUpperCase());
+              // setRawData(codedata[1]);
+              // const messageData = JSON.parse(decodeURIComponent(codedata[1]));
+              let messageData = JSON.parse(decodeURIComponent(codedata[1])); //Start
+              delete messageData.URLEXIT;
+              const modifiedRawData = JSON.stringify(messageData);
+
+              setDisplay("RAW: " + modifiedRawData.toUpperCase());
+              setRawData(modifiedRawData);
+              setMessageData(messageData);
+
               let reactUrl = "javascript:window.close('','_parent','');";
               let showMessage = "System error! Please try again shortly";
               const code = parseInt(codedata[0], 0);
@@ -95,7 +108,7 @@ const Progress: React.FC = () => {
               if (code >= 900) {
                 onErrorFound(showMessage, reactUrl);
               } else if (code >= 100 && code < 200) {
-                onSucceed("Thank you");
+                onSucceed("Thank you", reactUrl);
               }
             } else {
               setDisplay("code: " + data.Data);
@@ -103,7 +116,9 @@ const Progress: React.FC = () => {
             break;
 
           case "message":
-            setMessage(`Server: ${data.Data}`);
+            setDisplay("");
+            setDisplay(`Server: ${data.Data}`);
+            console.log(`event.data: ${event.data} eventjdata.ExeF: message`);
             break;
           case "wait":
             const waitTime = parseInt(data.Data);
@@ -113,13 +128,14 @@ const Progress: React.FC = () => {
             break;
           default:
             setMessage("Unknown message received");
+            setDisplay("Unknown message received");
         }
       };
 
       ws.onerror = (error) => {
         console.error("WebSocket error:", error);
         setMessage("WebSocket error occurred.");
-        setLoading(false); // Stop loading on error
+        setLoading(false);
       };
 
       ws.onclose = () => {
@@ -166,31 +182,69 @@ const Progress: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      height="100vh"
-    >
-      <ClipLoader
-        color={color}
-        loading={loading}
-        cssOverride={override}
-        size={80}
-        aria-label="Loading Spinner"
-        data-testid="loader"
-      />
-      <Box mt={2} textAlign="center">
-        <Typography variant="h4" color="textPrimary">
-          {message}
-        </Typography>
-        <Box mt={1}></Box>
-        <Typography variant="subtitle1" color="textSecondary" sx={{ fontSize: "0.85rem" }}>
-          RCID : {rcid}
-        </Typography>
-      </Box>
-    </Box>
+    <Grid container alignItems="center" justifyContent="center" style={{ minHeight: "100vh" }}>
+      <Grid item>
+        <Card sx={{ maxWidth: 600, padding: 6 }}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+            height="100%"
+          >
+            <ClipLoader
+              color={color}
+              loading={loading}
+              cssOverride={override}
+              size={60}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+            <Box mt={2}>
+              <Typography variant="h2" color="textPrimary" sx={{ wordBreak: "break-word" }}>
+                {messageData.Message ? messageData.Message.toUpperCase() : message.toUpperCase()}
+              </Typography>
+              <Box mt={1} />
+              <Typography
+                variant="subtitle2"
+                color="blue"
+                sx={{ fontSize: "1rem", wordBreak: "break-word" }}
+              >
+                RCID : {rcid}
+              </Typography>
+              {display && (
+                <Box mt={1}>
+                  <Typography
+                    variant="subtitle2"
+                    color="textPrimary"
+                    sx={{
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                      textAlign: "center",
+                    }}
+                  >
+                    {display}
+                  </Typography>
+                  {continueUrl && (
+                    <Box mt={2}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        href={continueUrl}
+                        sx={{ mt: 2, color: "#ffffff" }}
+                      >
+                        Continue
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 

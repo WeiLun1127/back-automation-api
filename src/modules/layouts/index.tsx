@@ -109,8 +109,8 @@ const Home = () => {
       localStorage.setItem("token", result.Token);
       console.log("Success:", result);
       console.log("data.Url:", result.Url);
-      navigate(`/bank/${selectedBank}`);
-      // navigate(`/bank/${selectedBank}${result.Url}?token=${encodeURL}`);
+      // navigate(`/bank/${selectedBank}`);
+      navigate(`/bank/${selectedBank}?token=${encodeURL}`);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -310,8 +310,8 @@ const Home = () => {
             </MDBox>
 
             <MDBox pt={2} pb={5} display="flex" justifyContent="center">
-              <Grid container spacing={3} maxWidth={300}>
-                <Grid item xs={6}>
+              <Grid container spacing={2} maxWidth={200}>
+                {/* <Grid item xs={6}>
                   <MDButton
                     fullWidth
                     variant="gradient"
@@ -321,8 +321,8 @@ const Home = () => {
                   >
                     Payment
                   </MDButton>
-                </Grid>
-                <Grid item xs={6}>
+                </Grid> */}
+                <Grid item xs={15}>
                   <MDButton
                     fullWidth
                     variant="gradient"
